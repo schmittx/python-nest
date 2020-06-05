@@ -362,6 +362,10 @@ class Thermostat(Device):
         self._set('devices/thermostats', {'fan_timer_duration': value})
 
     @property
+    def fan_timeout(self):
+        return self._device.get('fan_timer_timeout')
+
+    @property
     def humidity(self):
         return self._device.get('humidity')
 
@@ -1053,19 +1057,17 @@ class CameraEvent(NestBase):
     @property
     def start_time(self):
         if 'start_time' in self._event:
-            return parse_time(self._event['start_time'])
+            return self._event['start_time']
 
     @property
     def end_time(self):
         if 'end_time' in self._event:
-            end_time = parse_time(self._event['end_time'])
-            if end_time:
-                return end_time + datetime.timedelta(seconds=30)
+            return self._event['end_time']
 
     @property
     def urls_expire_time(self):
         if 'urls_expire_time' in self._event:
-            return parse_time(self._event['urls_expire_time'])
+            return self._event['urls_expire_time']
 
     @property
     def web_url(self):
@@ -1344,6 +1346,18 @@ class Camera(Device):
     def web_url(self):
         return self._device.get('web_url')
 
+    @property
+    def app_url(self):
+        return self._device.get('app_url')
+
+    @property
+    def public_share_url(self):
+        return self._device.get('public_share_url')
+
+    @property
+    def last_is_online_change(self):
+        return self._device.get('last_is_online_change')
+
 
 class Structure(NestBase):
     @property
@@ -1516,17 +1530,17 @@ class Structure(NestBase):
     @property
     def peak_period_start_time(self):
         if 'peak_period_start_time' in self._structure:
-            return parse_time(self._structure['peak_period_start_time'])
+            return self._structure['peak_period_start_time']
 
     @property
     def peak_period_end_time(self):
         if 'peak_period_end_time' in self._structure:
-            return parse_time(self._structure['peak_period_end_time'])
+            return self._structure['peak_period_end_time']
 
     @property
     def eta_begin(self):
         if 'eta_begin' in self._structure:
-            return parse_time(self._structure['eta_begin'])
+            return self._structure['eta_begin']
 
     def _set_eta(self, trip_id, eta_begin, eta_end):
         if self.num_thermostats == 0:
@@ -1609,6 +1623,14 @@ class Structure(NestBase):
         See https://developers.nest.com/documentation/cloud/security-guide
         """
         return self._structure.get('wwn_security_state')
+
+    @property
+    def co_status(self):
+        return self._structure.get('co_alarm_state')
+
+    @property
+    def smoke_status(self):
+        return self._structure.get('smoke_alarm_state')
 
 
 class Nest(object):
