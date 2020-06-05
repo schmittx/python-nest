@@ -1060,9 +1060,19 @@ class CameraEvent(NestBase):
             return self._event['start_time']
 
     @property
+    def _start_time(self):
+        if self.start_time:
+            return parse_time(self.start_time)
+
+    @property
     def end_time(self):
         if 'end_time' in self._event:
             return self._event['end_time']
+
+    @property
+    def _end_time(self):
+        if self.end_time:
+            return parse_time(self.end_time) + datetime.timedelta(seconds=30)
 
     @property
     def urls_expire_time(self):
@@ -1075,15 +1085,14 @@ class CameraEvent(NestBase):
 
     @property
     def is_ongoing(self):
-        if self.end_time is not None:
+        if self._end_time is not None:
             # sometimes, existing event is updated with a new start time
             # that's before the end_time which implies something new
-            if self.start_time > self.end_time:
+            if self._start_time > self._end_time:
                 return True
-
-            now = datetime.datetime.now(self.end_time.tzinfo)
+            now = datetime.datetime.now(self._end_time.tzinfo)
             # end time should be in the past
-            return self.end_time > now
+            return self._end_time > now
         # no end_time implies it's ongoing
         return True
 
